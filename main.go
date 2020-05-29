@@ -55,6 +55,8 @@ func (c *Client) GetId() string {
 }
 
 func handleConn(conn *websocket.Conn) {
+	fmt.Println("New client:", conn.RemoteAddr())
+
 	client := &Client{Id: rand.Hex(format.IdLength), Conn: conn}
 	clientsPool.Add(client)
 
@@ -106,6 +108,8 @@ func getMethod(name string) endpoint.Method {
 
 func handleRequest(client *Client, method endpoint.Method, req *endpoint.Request, reqInfo *endpoint.RequestInfo) {
 	res := method.Call(req)
+	fmt.Println("Sending response:", res)
+
 	resInfo := &endpoint.ResponseInfo{MethodName: reqInfo.MethodName}
 
 	buffer := bytes.NewBuffer(nil)
