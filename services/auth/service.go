@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"github.com/undefined7887/telepuz-backend/base"
-	"github.com/undefined7887/telepuz-backend/base/endpoint"
 	"github.com/undefined7887/telepuz-backend/cache"
 	"github.com/undefined7887/telepuz-backend/services/auth/methods"
+	"github.com/undefined7887/telepuz-backend/services/base"
+	"github.com/undefined7887/telepuz-backend/services/base/endpoint"
 )
 
 type authService struct {
