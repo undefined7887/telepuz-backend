@@ -64,7 +64,7 @@ func handleConn(conn *websocket.Conn) {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("Failed to receive request:", err.Error())
-			continue
+			return
 		}
 
 		decoder := msgpack.NewDecoder(bytes.NewReader(msg)).UseJSONTag(true)
