@@ -20,6 +20,7 @@ var clientsPool = cache.NewPool()
 var userPool = cache.NewPool()
 
 var authService = auth.NewService(userPool)
+var usersService = auth.NewService(userPool)
 
 func main() {
 	listenWebSockets(os.Args[1])
@@ -101,6 +102,9 @@ func getMethod(name string) endpoint.Method {
 	switch service {
 	case "auth":
 		return authService.GetMethod(name)
+
+	case "users":
+		return usersService.GetMethod(name)
 
 	default:
 		return nil
