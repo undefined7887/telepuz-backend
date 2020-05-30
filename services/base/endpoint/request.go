@@ -1,9 +1,11 @@
 package endpoint
 
-import "encoding/json"
-
 type RequestInfo struct {
 	MethodName string `json:"method_name"`
+}
+
+func (r *RequestInfo) String() string {
+	return "RequestInfo " + toJSON(r)
 }
 
 type Request struct {
@@ -11,10 +13,5 @@ type Request struct {
 }
 
 func (r *Request) String() string {
-	bytes, err := json.MarshalIndent(r, "", "\t")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return "Request " + string(bytes)
+	return "Request " + toJSON(r)
 }

@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var clientsPool = cache.NewPool()
@@ -89,7 +90,7 @@ func handleConn(conn *websocket.Conn) {
 			continue
 		}
 
-		fmt.Println("New request:\n", req)
+		fmt.Printf("New request:\n%s\n%s", reqInfo, req)
 		go handleRequest(client, method, req, reqInfo)
 	}
 }
@@ -107,9 +108,9 @@ func getMethod(name string) endpoint.Method {
 }
 
 func handleRequest(client *Client, method endpoint.Method, req *endpoint.Request, reqInfo *endpoint.RequestInfo) {
-	res := method.Call(req)
-	fmt.Println("Sending response:", res)
+	startTimePoint := time.Now()
 
+	res := method.Call(req)
 	resInfo := &endpoint.ResponseInfo{MethodName: reqInfo.MethodName}
 
 	buffer := bytes.NewBuffer(nil)
@@ -129,4 +130,6 @@ func handleRequest(client *Client, method endpoint.Method, req *endpoint.Request
 		fmt.Println("Failed to send response:", err.Error())
 		return
 	}
+
+	fmt.Printf("Sent response (time=%d ms):\n%s\n%s", time.Since(startTimePoint).Milliseconds(), resInfo, res)
 }
