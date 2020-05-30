@@ -90,7 +90,7 @@ func handleConn(conn *websocket.Conn) {
 			continue
 		}
 
-		fmt.Printf("New request:\n%s\n%s", reqInfo, req)
+		fmt.Printf("New request:\n%s\n%s\n", reqInfo, req)
 		go handleRequest(client, method, req, reqInfo)
 	}
 }
@@ -131,5 +131,5 @@ func handleRequest(client *Client, method endpoint.Method, req *endpoint.Request
 		return
 	}
 
-	fmt.Printf("Sent response (time=%d ms):\n%s\n%s", time.Since(startTimePoint).Milliseconds(), resInfo, res)
+	fmt.Printf("Sent response (time=%d ms):\n%s\n%s\n", time.Since(startTimePoint).Milliseconds(), resInfo, res)
 }
