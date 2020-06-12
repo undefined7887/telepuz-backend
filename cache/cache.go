@@ -33,7 +33,7 @@ func (p *Pool) GetAll() []Item {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
-	items := make([]Item, len(p.pool))
+	items := make([]Item, 0, len(p.pool))
 
 	for _, val := range p.pool {
 		items = append(items, val)

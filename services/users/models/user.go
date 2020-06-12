@@ -1,8 +1,8 @@
 package models
 
 type User struct {
-	Id       string
-	Nickname string
+	Id       string `json:"id"`
+	Nickname string `json:"nickname"`
 }
 
 func (u *User) GetId() string {
