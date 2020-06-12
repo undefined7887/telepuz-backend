@@ -8,6 +8,7 @@ import (
 	"github.com/undefined7887/telepuz-backend/format"
 	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/services/auth"
+	"github.com/undefined7887/telepuz-backend/services/users"
 	"github.com/undefined7887/telepuz-backend/services/base/endpoint"
 	"github.com/vmihailenco/msgpack/v4"
 	"net/http"
@@ -20,7 +21,7 @@ var clientsPool = cache.NewPool()
 var userPool = cache.NewPool()
 
 var authService = auth.NewService(userPool)
-var usersService = auth.NewService(userPool)
+var usersService = users.NewService(userPool)
 
 func main() {
 	listenWebSockets(os.Args[1])
