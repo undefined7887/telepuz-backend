@@ -4,8 +4,8 @@ import (
 	"github.com/undefined7887/telepuz-backend/cache"
 	"github.com/undefined7887/telepuz-backend/format"
 	"github.com/undefined7887/telepuz-backend/rand"
-	"github.com/undefined7887/telepuz-backend/services/auth/models"
 	"github.com/undefined7887/telepuz-backend/services/base/endpoint"
+	"github.com/undefined7887/telepuz-backend/services/users/models"
 )
 
 type loginMethodRequestData struct {
