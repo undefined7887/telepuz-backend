@@ -38,7 +38,7 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 	message := &models.Message{
 		Id:     rand.HexString(format.IdLength),
 		UserId: h.Client.UserId,
-		Text:   event.Text,
+		Text:   event.MessageText,
 	}
 
 	h.Client.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
@@ -46,5 +46,5 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {
-	return len(event.Text) > 0 && len(event.Text) < 6000
+	return len(event.MessageText) > 0 && len(event.MessageText) < 6000
 }

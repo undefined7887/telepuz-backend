@@ -23,7 +23,7 @@ func (e *AuthLoginReply) String() string {
 }
 
 type MessagesSendEvent struct {
-	Text string `json:"text"`
+	MessageText string `json:"message_text"`
 }
 
 func (e *MessagesSendEvent) String() string {
