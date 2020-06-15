@@ -17,11 +17,15 @@ func Int(min, max int) int {
 	return int(number.Int64()) + min
 }
 
-func Hex(length int) string {
+func Bytes(length int) []byte {
 	bytes := make([]byte, length)
 	if _, err := rand.Read(bytes); err != nil {
 		panic(err.Error())
 	}
 
-	return hex.EncodeToString(bytes)
+	return bytes
+}
+
+func HexString(length int) string {
+	return hex.EncodeToString(Bytes(length))
 }

@@ -1,21 +1,21 @@
-package methods
+package handlers
 
 import (
-	"github.com/undefined7887/telepuz-backend/cache"
-	"github.com/undefined7887/telepuz-backend/services/base/endpoint"
+	"github.com/undefined7887/telepuz-backend/api/models"
+	"github.com/undefined7887/telepuz-backend/base/repository"
 )
 
-type getAllMethodRequestData struct{}
+type usersGetAllEvent struct{}
 
-type getAllMethodResponseData struct {
-	Users []cache.Item `json:"users"`
+type usersGetAllEventReply struct {
+	Users []models.User `json:"users"`
 }
 
 type getAllMethod struct {
-	userPool *cache.Pool
+	userPool *repository.Pool
 }
 
-func NewGetAllMethod(userPool *cache.Pool) endpoint.Method {
+func NewGetAllMethod(userPool *repository.Pool) endpoint.Method {
 	return &getAllMethod{userPool: userPool}
 }
 
