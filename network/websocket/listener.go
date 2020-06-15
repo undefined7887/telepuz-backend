@@ -46,7 +46,7 @@ func (l *listener) handleConns(writer http.ResponseWriter, req *http.Request) {
 func NewListener(logger log.Logger, path, addr string) network.Listener {
 	logger = logger.WithPrefix("websocket-listener")
 
-	listener := &listener{logger: logger, conns: make(map[int]*conn)}
+	listener := &listener{logger: logger, conns: make(map[string]*conn)}
 
 	listener.inner.HandleFunc(path, listener.handleConns)
 	go listener.listen(addr)
