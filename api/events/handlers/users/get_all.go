@@ -20,11 +20,11 @@ func (h *GetAllEventHandler) NewEvent() network.Event {
 }
 
 func (h *GetAllEventHandler) ServeEvent(context.Context, network.Event) {
-	if h.Session.UserId == "" {
-		h.Conn.Send("users.getAll", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+	if h.UserId == "" {
+		h.Send("users.getAll", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
 	users := h.UserPool.GetAll()
-	h.Conn.Send("users.getAll", &events.UsersGetAllReply{Users: users.([]*models.User)})
+	h.Send("users.getAll", &events.UsersGetAllReply{Users: users.([]*models.User)})
 }

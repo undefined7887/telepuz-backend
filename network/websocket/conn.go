@@ -52,6 +52,15 @@ func (c *conn) handleEvents() {
 		_, msg, err := c.inner.ReadMessage()
 		if err != nil {
 			c.logger.Warn("Failed to receive message: %s", err.Error())
+
+			handler := c.handlers["close"]
+			if handler == nil {
+				c.logger.Warn("Failed to find handler for close")
+				continue
+			}
+
+			c.logger.Info("Closed")
+			handler.ServeEvent(nil, nil)
 			return
 		}
 

@@ -3,6 +3,7 @@ package messages
 import (
 	"context"
 	"github.com/undefined7887/telepuz-backend/api/events"
+	"github.com/undefined7887/telepuz-backend/api/format"
 	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/api/results"
 	"github.com/undefined7887/telepuz-backend/network"
@@ -11,7 +12,7 @@ import (
 type SendEventHandler struct {
 	network.Conn
 	network.Listener
-	Session *models.Session
+	*models.Session
 }
 
 func (h *SendEventHandler) NewEvent() network.Event {
@@ -26,15 +27,17 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 		return
 	}
 
-	if h.Session.UserId == "" {
+	if h.UserId == "" {
 		h.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
 	h.Send("messages.send", &events.MessagesSendReply{})
-	h.BroadcastSend("messages.send", &events.MessageNewUpdate{Message: &event.Message})
+	h.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: &event.Message}, h.Conn)
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {
-	return true
+	return format.RegexpId.MatchString(event.Id) &&
+		format.RegexpId.MatchString(event.UserId) &&
+		len(event.Text) > 0 && len(event.Text) < 6000
 }

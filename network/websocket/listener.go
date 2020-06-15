@@ -24,9 +24,11 @@ func (l *listener) Handle(handler network.ConnHandler) {
 	l.handlers = append(l.handlers, handler)
 }
 
-func (l *listener) BroadcastSend(path string, event network.Event) {
+func (l *listener) BroadcastSend(path string, event network.Event, excludeConn network.Conn) {
 	for _, conn := range l.conns {
-		conn.Send(path, event)
+		if conn != excludeConn {
+			conn.Send(path, event)
+		}
 	}
 }
 
