@@ -26,6 +26,5 @@ func (h *GetAllEventHandler) ServeEvent(context.Context, network.Event) {
 		return
 	}
 
-	users := h.UserPool.GetAll("")
-	h.Client.Send("users.getAll", &events.UsersGetAllReply{Users: users})
+	h.Client.Send("users.getAll", &events.UsersGetAllReply{Users: h.UserPool.GetAll("")})
 }

@@ -25,7 +25,6 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 		ClientPool: h.clientPool,
 		Conn:       conn,
 	}
-
 	h.clientPool.Add(client.Id, client)
 
 	conn.Handle("auth.login", &auth.LoginEventHandler{
@@ -54,5 +53,9 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 }
 
 func NewConnHandler(listener network.Listener, clientPool, userPool *repository.Pool) network.ConnHandler {
-	return &connHandler{listener: listener, clientPool: clientPool, userPool: userPool}
+	return &connHandler{
+		listener:   listener,
+		clientPool: clientPool,
+		userPool:   userPool,
+	}
 }

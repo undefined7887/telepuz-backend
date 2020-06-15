@@ -30,7 +30,10 @@ func (h *LoginEventHandler) ServeEvent(_ context.Context, eventInterface network
 		return
 	}
 
-	user := &models.User{Id: rand.HexString(format.IdLength), Nickname: event.UserNickname}
+	user := &models.User{
+		Id:       rand.HexString(format.IdLength),
+		Nickname: event.UserNickname,
+	}
 	h.UserPool.Add(user.Id, user)
 
 	if h.Client.UserId != "" {
