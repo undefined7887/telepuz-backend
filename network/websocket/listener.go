@@ -46,6 +46,8 @@ func (l *listener) handleConns(writer http.ResponseWriter, req *http.Request) {
 	conn := NewConn(l.logger, innerConn)
 	l.conns = append(l.conns, conn)
 
+	l.logger.Info("Accepted connection: %s", innerConn.RemoteAddr())
+
 	for _, handler := range l.handlers {
 		handler.ServeConn(conn)
 	}

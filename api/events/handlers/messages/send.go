@@ -19,11 +19,22 @@ func (h *SendEventHandler) NewEvent() network.Event {
 }
 
 func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	_ = eventInterface.(*events.MessagesSendEvent)
+	event := eventInterface.(*events.MessagesSendEvent)
 
-	if h.Session.UserId == "" {
-		h.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+	if !h.checkEvent(event) {
+		h.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
+	if h.Session.UserId == "" {
+		h.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+		return
+	}
+
+	h.Send("messages.send", &events.MessagesSendReply{})
+	h.BroadcastSend("messages.send", &events.MessageNewUpdate{Message: &event.Message})
+}
+
+func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {
+	return true
 }

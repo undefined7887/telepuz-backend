@@ -26,7 +26,7 @@ func (h *LoginEventHandler) ServeEvent(_ context.Context, eventInterface network
 	event := eventInterface.(*events.AuthLoginEvent)
 
 	if !h.checkEvent(event) {
-		h.Conn.Send("auth.login", &events.AuthLoginReply{Result: results.ErrInvalidFormat})
+		h.Send("auth.login", &events.AuthLoginReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
@@ -39,11 +39,11 @@ func (h *LoginEventHandler) ServeEvent(_ context.Context, eventInterface network
 
 	if h.Session.UserId != "" {
 		h.UserPool.Remove(h.Session.UserId)
-		h.Listener.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Session.UserId})
+		h.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Session.UserId})
 	}
 
-	h.Conn.Send("auth.login", &events.AuthLoginReply{UserId: user.Id})
-	h.Listener.BroadcastSend("updates.user.new", &events.UserNewUpdate{User: user})
+	h.Send("auth.login", &events.AuthLoginReply{UserId: user.Id})
+	h.BroadcastSend("updates.user.new", &events.UserNewUpdate{User: user})
 }
 
 func (h *LoginEventHandler) checkEvent(event *events.AuthLoginEvent) bool {

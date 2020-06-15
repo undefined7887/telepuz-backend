@@ -68,3 +68,11 @@ type UserDeletedUpdate struct {
 func (e *UserDeletedUpdate) String() string {
 	return utils.PrettyStruct("Event [updates.user.deleted]", e)
 }
+
+type MessageNewUpdate struct {
+	Message *models.Message `json:"message"`
+}
+
+func (e *MessageNewUpdate) String() string {
+	return utils.PrettyStruct("Event [updates.message.new]", e)
+}
