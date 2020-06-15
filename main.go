@@ -1,22 +1,32 @@
 package main
 
 import (
-	"github.com/undefined7887/telepuz-backend/base/log"
-	"github.com/undefined7887/telepuz-backend/base/network"
+	"github.com/undefined7887/telepuz-backend/api"
+	"github.com/undefined7887/telepuz-backend/log"
+	"github.com/undefined7887/telepuz-backend/network/websocket"
+	"github.com/undefined7887/telepuz-backend/repository"
 	"os"
 	"regexp"
 )
 
-var addrRegexp = regexp.MustCompile("")
+var addrRegexp = regexp.MustCompile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+$")
 
 func main() {
 	logger := log.NewDefaultLogger("")
+
+	if len(os.Args) < 2 {
+		logger.Fatal("You should pass listening address as parameter")
+	}
 
 	addr := os.Args[1]
 	if !addrRegexp.MatchString(addr) {
 		logger.Fatal("Wrong address format: address should be like ip:port")
 	}
 
-	listener := network.NewWebsocketListener(logger, "/", addr)
+	userPool := repository.NewPool()
 
+	listener := websocket.NewListener(logger, "/", addr)
+	listener.Handle(api.NewConnHandler(listener, userPool))
+
+	select {}
 }

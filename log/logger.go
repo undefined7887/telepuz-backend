@@ -12,7 +12,7 @@ var (
 )
 
 func tag(name string) string {
-	return fmt.Sprintf("[%s ]", name)
+	return fmt.Sprintf("[%s] ", name)
 }
 
 type Logger interface {

@@ -6,9 +6,6 @@ import (
 )
 
 type Conn interface {
-	SetData(value interface{})
-	Data() interface{}
-
 	Handle(path string, handler EventHandler)
 	Send(path string, event Event)
 }
@@ -19,5 +16,5 @@ type Event interface {
 
 type EventHandler interface {
 	NewEvent() Event
-	Handle(ctx context.Context, event Event)
+	ServeEvent(ctx context.Context, event Event)
 }

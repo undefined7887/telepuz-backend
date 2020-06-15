@@ -4,36 +4,32 @@ import "sync"
 
 type Pool struct {
 	mux  sync.Mutex
-	pool map[string]PoolItem
-}
-
-type PoolItem interface {
-	GetId() string
+	pool map[string]interface{}
 }
 
 func NewPool() *Pool {
-	return &Pool{pool: make(map[string]PoolItem)}
+	return &Pool{pool: make(map[string]interface{})}
 }
 
-func (p *Pool) Add(item PoolItem) {
+func (p *Pool) Add(id string, value interface{}) {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
-	p.pool[item.GetId()] = item
+	p.pool[id] = value
 }
 
-func (p *Pool) Get(id string) PoolItem {
+func (p *Pool) Get(id string) interface{} {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
 	return p.pool[id]
 }
 
-func (p *Pool) GetAll() []PoolItem {
+func (p *Pool) GetAll() interface{} {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
-	items := make([]PoolItem, 0, len(p.pool))
+	items := make([]interface{}, 0, len(p.pool))
 
 	for _, val := range p.pool {
 		items = append(items, val)
@@ -53,5 +49,5 @@ func (p *Pool) RemoveAll() {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
-	p.pool = make(map[string]PoolItem)
+	p.pool = make(map[string]interface{})
 }

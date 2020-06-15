@@ -1,32 +1,33 @@
-package network
+package websocket
 
 import (
 	"bytes"
 	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/undefined7887/telepuz-backend/base/log"
+	"github.com/undefined7887/telepuz-backend/log"
+	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/vmihailenco/msgpack/v4"
 	"time"
 )
 
-type websocketConn struct {
+type conn struct {
 	logger log.Logger
 	inner  *websocket.Conn
 
 	timeout  time.Duration
-	handlers map[string]EventHandler
+	handlers map[string]network.EventHandler
 }
 
-func (c *websocketConn) SetTimeout(timeout time.Duration) {
+func (c *conn) SetTimeout(timeout time.Duration) {
 	c.timeout = timeout
 }
 
-func (c *websocketConn) Handle(path string, handler EventHandler) {
+func (c *conn) Handle(path string, handler network.EventHandler) {
 	c.handlers[path] = handler
 }
 
-func (c *websocketConn) Send(path string, event Event) {
+func (c *conn) Send(path string, event network.Event) {
 	buffer := bytes.NewBuffer(nil)
 	encoder := msgpack.NewEncoder(buffer).UseJSONTag(true)
 
@@ -35,7 +36,7 @@ func (c *websocketConn) Send(path string, event Event) {
 	}
 
 	if err := encoder.Encode(event); err != nil {
-		c.logger.Fatal("Failed to write event: %s", err.Error())
+		c.logger.Fatal("Failed to write events: %s", err.Error())
 	}
 
 	if err := c.inner.WriteMessage(websocket.BinaryMessage, buffer.Bytes()); err != nil {
@@ -43,10 +44,10 @@ func (c *websocketConn) Send(path string, event Event) {
 		return
 	}
 
-	c.logger.Info("Sent event \"%s\": %s", path, event)
+	c.logger.Info("Sent events \"%s\": %s", path, event)
 }
 
-func (c *websocketConn) handleEvents() {
+func (c *conn) handleEvents() {
 	for {
 		_, msg, err := c.inner.ReadMessage()
 		if err != nil {
@@ -70,24 +71,24 @@ func (c *websocketConn) handleEvents() {
 
 		event := handler.NewEvent()
 		if err := decoder.Decode(event); err != nil {
-			c.logger.Warn("Failed to read event: %s", err.Error())
+			c.logger.Warn("Failed to read events: %s", err.Error())
 			continue
 		}
 
-		c.logger.Info("Received event \"%s\": %s", path, event)
+		c.logger.Info("Received events \"%s\": %s", path, event)
 
 		ctx, _ := context.WithTimeout(context.TODO(), c.timeout)
-		go handler.Handle(ctx, event)
+		go handler.ServeEvent(ctx, event)
 	}
 }
 
-func NewWebsocketConn(logger log.Logger, inner *websocket.Conn) Conn {
+func NewConn(logger log.Logger, inner *websocket.Conn) network.Conn {
 	logger = logger.WithPrefix(fmt.Sprintf("websocket-connection [%s]", inner.RemoteAddr()))
 
-	conn := &websocketConn{
+	conn := &conn{
 		logger:   logger,
 		inner:    inner,
-		handlers: make(map[string]EventHandler),
+		handlers: make(map[string]network.EventHandler),
 	}
 
 	go conn.handleEvents()

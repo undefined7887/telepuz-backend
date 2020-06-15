@@ -5,7 +5,3 @@ type Message struct {
 	UserId string `json:"user_id"`
 	Text   string `json:"text"`
 }
-
-func (u *Message) GetId() string {
-	return u.Id
-}

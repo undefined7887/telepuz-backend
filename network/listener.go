@@ -5,4 +5,6 @@ type Listener interface {
 	BroadcastSend(path string, event Event)
 }
 
-type ConnHandler func(conn Conn)
+type ConnHandler interface {
+	ServeConn(conn Conn)
+}
