@@ -8,6 +8,7 @@ import (
 type Conn interface {
 	Handle(path string, handler EventHandler)
 	Send(path string, event Event)
+	BroadcastSend(path string, event Event)
 }
 
 type Event interface {

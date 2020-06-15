@@ -12,8 +12,11 @@ import (
 )
 
 type conn struct {
+	id     int
 	logger log.Logger
-	inner  *websocket.Conn
+
+	listener *listener
+	inner    *websocket.Conn
 
 	timeout  time.Duration
 	handlers map[string]network.EventHandler
@@ -47,11 +50,20 @@ func (c *conn) Send(path string, event network.Event) {
 	c.logger.Info("Sent event \"%s\":\n%s", path, event)
 }
 
+func (c *conn) BroadcastSend(path string, event network.Event) {
+	for _, conn := range c.listener.conns {
+		if conn.id != c.id {
+			conn.Send(path, event)
+		}
+	}
+}
+
 func (c *conn) handleEvents() {
 	for {
 		_, msg, err := c.inner.ReadMessage()
 		if err != nil {
-			c.logger.Warn("Failed to receive message: %s", err.Error())
+			c.logger.Info("Closed")
+			delete(c.listener.conns, c.id)
 
 			handler := c.handlers["close"]
 			if handler == nil {
@@ -59,8 +71,7 @@ func (c *conn) handleEvents() {
 				continue
 			}
 
-			c.logger.Info("Closed")
-			handler.ServeEvent(nil, nil)
+			go handler.ServeEvent(nil, nil)
 			return
 		}
 
@@ -91,15 +102,19 @@ func (c *conn) handleEvents() {
 	}
 }
 
-func NewConn(logger log.Logger, inner *websocket.Conn) network.Conn {
+func newConn(logger log.Logger, listener *listener, inner *websocket.Conn) network.Conn {
 	logger = logger.WithPrefix(fmt.Sprintf("websocket-connection [%s]", inner.RemoteAddr()))
 
 	conn := &conn{
+		id:       len(listener.conns),
 		logger:   logger,
+		listener: listener,
 		inner:    inner,
 		handlers: make(map[string]network.EventHandler),
 	}
 
+	listener.conns[conn.id] = conn
 	go conn.handleEvents()
+
 	return conn
 }

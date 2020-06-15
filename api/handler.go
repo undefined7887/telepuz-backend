@@ -20,7 +20,6 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 
 	conn.Handle("auth.login", &auth.LoginEventHandler{
 		Conn:     conn,
-		Listener: h.listener,
 		Session:  session,
 		UserPool: h.userPool,
 	})
@@ -32,14 +31,12 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 	})
 
 	conn.Handle("messages.send", &messages.SendEventHandler{
-		Conn:     conn,
-		Listener: h.listener,
-		Session:  session,
+		Conn:    conn,
+		Session: session,
 	})
 
 	conn.Handle("close", &handlers.CloseEventHandler{
 		Conn:     conn,
-		Listener: h.listener,
 		Session:  session,
 		UserPool: h.userPool,
 	})

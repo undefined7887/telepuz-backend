@@ -10,9 +10,8 @@ import (
 )
 
 type SendEventHandler struct {
-	network.Conn
-	network.Listener
-	*models.Session
+	Conn    network.Conn
+	Session *models.Session
 }
 
 func (h *SendEventHandler) NewEvent() network.Event {
@@ -23,17 +22,17 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 	event := eventInterface.(*events.MessagesSendEvent)
 
 	if !h.checkEvent(event) {
-		h.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
+		h.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
-	if h.UserId == "" {
-		h.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+	if h.Session.UserId == "" {
+		h.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
-	h.Send("messages.send", &events.MessagesSendReply{})
-	h.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: &event.Message}, h.Conn)
+	h.Conn.Send("messages.send", &events.MessagesSendReply{})
+	h.Conn.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: &event.Message})
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {
