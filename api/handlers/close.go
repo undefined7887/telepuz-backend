@@ -9,9 +9,10 @@ import (
 )
 
 type CloseEventHandler struct {
-	Conn     network.Conn
-	Session  *models.Session
-	UserPool *repository.Pool
+	Client *models.Client
+
+	ClientPool *repository.Pool
+	UserPool   *repository.Pool
 }
 
 func (h *CloseEventHandler) NewEvent() network.Event {
@@ -19,8 +20,10 @@ func (h *CloseEventHandler) NewEvent() network.Event {
 }
 
 func (h *CloseEventHandler) ServeEvent(context.Context, network.Event) {
-	if h.Session.UserId != "" {
-		h.UserPool.Remove(h.Session.UserId)
-		h.Conn.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Session.UserId})
+	if h.Client.UserId != "" {
+		h.UserPool.Remove(h.Client.UserId)
+		h.Client.BroadcastOthersWithUserId("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Client.UserId})
 	}
+
+	h.ClientPool.Remove(h.Client.Id)
 }

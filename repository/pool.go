@@ -25,14 +25,16 @@ func (p *Pool) Get(id string) interface{} {
 	return p.pool[id]
 }
 
-func (p *Pool) GetAll() []interface{} {
+func (p *Pool) GetAll(excludeId string) []interface{} {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
 	items := make([]interface{}, 0, len(p.pool))
 
-	for _, val := range p.pool {
-		items = append(items, val)
+	for id, value := range p.pool {
+		if id != excludeId {
+			items = append(items, value)
+		}
 	}
 
 	return items

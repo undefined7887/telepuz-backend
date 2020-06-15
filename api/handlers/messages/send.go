@@ -7,39 +7,42 @@ import (
 	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/api/results"
 	"github.com/undefined7887/telepuz-backend/network"
+	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/utils/rand"
 )
 
 type SendEventHandler struct {
-	Conn    network.Conn
-	Session *models.Session
+	Client *models.Client
+
+	ClientPool *repository.Pool
+	UserPool   *repository.Pool
 }
 
 func (h *SendEventHandler) NewEvent() network.Event {
-	return &events.UsersGetAllEvent{}
+	return &events.MessagesSendEvent{}
 }
 
 func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
 	event := eventInterface.(*events.MessagesSendEvent)
 
 	if !h.checkEvent(event) {
-		h.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
+		h.Client.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
-	if h.Session.UserId == "" {
-		h.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+	if h.Client.UserId == "" {
+		h.Client.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
 	message := &models.Message{
 		Id:     rand.HexString(format.IdLength),
-		UserId: h.Session.UserId,
+		UserId: h.Client.UserId,
 		Text:   event.Text,
 	}
 
-	h.Conn.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
-	h.Conn.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: message})
+	h.Client.Conn.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
+	h.Client.BroadcastOthersWithUserId("updates.message.new", &events.MessageNewUpdate{Message: message})
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {

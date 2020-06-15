@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/undefined7887/telepuz-backend/api/format"
 	"github.com/undefined7887/telepuz-backend/api/handlers"
 	"github.com/undefined7887/telepuz-backend/api/handlers/auth"
 	"github.com/undefined7887/telepuz-backend/api/handlers/messages"
@@ -8,40 +9,45 @@ import (
 	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/utils/rand"
 )
 
 type connHandler struct {
 	listener network.Listener
-	userPool *repository.Pool
+
+	clientPool *repository.Pool
+	userPool   *repository.Pool
 }
 
 func (h *connHandler) ServeConn(conn network.Conn) {
-	session := &models.Session{}
+	client := &models.Client{ClientPool: h.clientPool, Id: rand.HexString(format.IdLength), Conn: conn}
+	h.clientPool.Add(client.Id, client)
 
 	conn.Handle("auth.login", &auth.LoginEventHandler{
-		Conn:     conn,
-		Session:  session,
-		UserPool: h.userPool,
+		Client:     client,
+		ClientPool: h.clientPool,
+		UserPool:   h.userPool,
 	})
 
 	conn.Handle("users.getAll", &users.GetAllEventHandler{
-		Conn:     conn,
-		Session:  session,
-		UserPool: h.userPool,
+		Client:     client,
+		ClientPool: h.clientPool,
+		UserPool:   h.userPool,
 	})
 
 	conn.Handle("messages.send", &messages.SendEventHandler{
-		Conn:    conn,
-		Session: session,
+		Client:     client,
+		ClientPool: h.clientPool,
+		UserPool:   h.userPool,
 	})
 
 	conn.Handle("close", &handlers.CloseEventHandler{
-		Conn:     conn,
-		Session:  session,
-		UserPool: h.userPool,
+		Client:     client,
+		ClientPool: h.clientPool,
+		UserPool:   h.userPool,
 	})
 }
 
-func NewConnHandler(listener network.Listener, userPool *repository.Pool) network.ConnHandler {
-	return &connHandler{listener: listener, userPool: userPool}
+func NewConnHandler(listener network.Listener, clientPool, userPool *repository.Pool) network.ConnHandler {
+	return &connHandler{listener: listener, clientPool: clientPool, userPool: userPool}
 }

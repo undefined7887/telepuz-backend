@@ -23,10 +23,11 @@ func main() {
 		logger.Fatal("Wrong address format: address should be like ip:port")
 	}
 
+	clientPool := repository.NewPool()
 	userPool := repository.NewPool()
 
 	listener := websocket.NewListener(logger, "/", addr)
-	listener.Handle(api.NewConnHandler(listener, userPool))
+	listener.Handle(api.NewConnHandler(listener, clientPool, userPool))
 
 	select {}
 }

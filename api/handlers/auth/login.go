@@ -12,9 +12,10 @@ import (
 )
 
 type LoginEventHandler struct {
-	Conn     network.Conn
-	Session  *models.Session
-	UserPool *repository.Pool
+	Client *models.Client
+
+	ClientPool *repository.Pool
+	UserPool   *repository.Pool
 }
 
 func (h *LoginEventHandler) NewEvent() network.Event {
@@ -25,26 +26,22 @@ func (h *LoginEventHandler) ServeEvent(_ context.Context, eventInterface network
 	event := eventInterface.(*events.AuthLoginEvent)
 
 	if !h.checkEvent(event) {
-		h.Conn.Send("auth.login", &events.AuthLoginReply{Result: results.ErrInvalidFormat})
+		h.Client.Conn.Send("auth.login", &events.AuthLoginReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
-	user := &models.User{
-		Id:       rand.HexString(format.IdLength),
-		Nickname: event.Nickname,
-	}
-
+	user := &models.User{Id: rand.HexString(format.IdLength), Nickname: event.Nickname}
 	h.UserPool.Add(user.Id, user)
 
-	if h.Session.UserId != "" {
-		h.UserPool.Remove(h.Session.UserId)
-		h.Conn.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Session.UserId})
+	if h.Client.UserId != "" {
+		h.UserPool.Remove(h.Client.UserId)
+		h.Client.BroadcastOthersWithUserId("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Client.UserId})
 	}
 
-	h.Session.UserId = user.Id
+	h.Client.UserId = user.Id
 
-	h.Conn.Send("auth.login", &events.AuthLoginReply{UserId: user.Id})
-	h.Conn.BroadcastSend("updates.user.new", &events.UserNewUpdate{User: user})
+	h.Client.Conn.Send("auth.login", &events.AuthLoginReply{UserId: user.Id})
+	h.Client.BroadcastOthersWithUserId("updates.user.new", &events.UserNewUpdate{User: user})
 }
 
 func (h *LoginEventHandler) checkEvent(event *events.AuthLoginEvent) bool {

@@ -10,9 +10,10 @@ import (
 )
 
 type GetAllEventHandler struct {
-	Conn     network.Conn
-	Session  *models.Session
-	UserPool *repository.Pool
+	Client *models.Client
+
+	ClientPool *repository.Pool
+	UserPool   *repository.Pool
 }
 
 func (h *GetAllEventHandler) NewEvent() network.Event {
@@ -20,11 +21,11 @@ func (h *GetAllEventHandler) NewEvent() network.Event {
 }
 
 func (h *GetAllEventHandler) ServeEvent(context.Context, network.Event) {
-	if h.Session.UserId == "" {
-		h.Conn.Send("users.getAll", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+	if h.Client.UserId == "" {
+		h.Client.Conn.Send("users.getAll", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
-	users := h.UserPool.GetAll()
-	h.Conn.Send("users.getAll", &events.UsersGetAllReply{Users: users})
+	users := h.UserPool.GetAll("")
+	h.Client.Conn.Send("users.getAll", &events.UsersGetAllReply{Users: users})
 }

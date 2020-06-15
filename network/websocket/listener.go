@@ -16,7 +16,6 @@ type listener struct {
 	logger log.Logger
 	inner  http.ServeMux
 
-	conns   map[string]*conn
 	handler network.ConnHandler
 }
 
@@ -38,15 +37,16 @@ func (l *listener) handleConns(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	l.logger.Info("Accepted connection: %s", innerConn.RemoteAddr())
-	conn := newConn(l.logger, l, innerConn)
+	conn := newConn(l.logger, innerConn)
 
-	go l.handler.ServeConn(conn)
+	// This shouldn't block
+	l.handler.ServeConn(conn)
 }
 
 func NewListener(logger log.Logger, path, addr string) network.Listener {
 	logger = logger.WithPrefix("websocket-listener")
 
-	listener := &listener{logger: logger, conns: make(map[string]*conn)}
+	listener := &listener{logger: logger}
 
 	listener.inner.HandleFunc(path, listener.handleConns)
 	go listener.listen(addr)

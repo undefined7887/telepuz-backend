@@ -5,20 +5,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/undefined7887/telepuz-backend/api/format"
 	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network"
-	"github.com/undefined7887/telepuz-backend/utils/rand"
 	"github.com/vmihailenco/msgpack/v4"
 	"time"
 )
 
 type conn struct {
-	id     string
 	logger log.Logger
-
-	listener *listener
-	inner    *websocket.Conn
+	inner  *websocket.Conn
 
 	timeout  time.Duration
 	handlers map[string]network.EventHandler
@@ -52,20 +47,11 @@ func (c *conn) Send(path string, event network.Event) {
 	c.logger.Info("Sent event \"%s\":\n%s", path, event)
 }
 
-func (c *conn) BroadcastSend(path string, event network.Event) {
-	for _, conn := range c.listener.conns {
-		if conn.id != c.id {
-			conn.Send(path, event)
-		}
-	}
-}
-
 func (c *conn) handleEvents() {
 	for {
 		_, msg, err := c.inner.ReadMessage()
 		if err != nil {
 			c.logger.Info("Closed")
-			delete(c.listener.conns, c.id)
 
 			handler := c.handlers["close"]
 			if handler == nil {
@@ -104,19 +90,15 @@ func (c *conn) handleEvents() {
 	}
 }
 
-func newConn(logger log.Logger, listener *listener, inner *websocket.Conn) network.Conn {
+func newConn(logger log.Logger, inner *websocket.Conn) network.Conn {
 	logger = logger.WithPrefix(fmt.Sprintf("websocket-connection [%s]", inner.RemoteAddr()))
 
 	conn := &conn{
-		id:       rand.HexString(format.IdLength),
 		logger:   logger,
-		listener: listener,
 		inner:    inner,
 		handlers: make(map[string]network.EventHandler),
 	}
 
-	listener.conns[conn.id] = conn
 	go conn.handleEvents()
-
 	return conn
 }
