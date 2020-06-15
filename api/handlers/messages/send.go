@@ -7,6 +7,7 @@ import (
 	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/api/results"
 	"github.com/undefined7887/telepuz-backend/network"
+	"github.com/undefined7887/telepuz-backend/utils/rand"
 )
 
 type SendEventHandler struct {
@@ -31,12 +32,16 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 		return
 	}
 
-	h.Conn.Send("messages.send", &events.MessagesSendReply{})
-	h.Conn.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: &event.Message})
+	message := &models.Message{
+		Id:     rand.HexString(format.IdLength),
+		UserId: h.Session.UserId,
+		Text:   event.Text,
+	}
+
+	h.Conn.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
+	h.Conn.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: message})
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {
-	return format.RegexpId.MatchString(event.Id) &&
-		format.RegexpId.MatchString(event.UserId) &&
-		len(event.Text) > 0 && len(event.Text) < 6000
+	return len(event.Text) > 0 && len(event.Text) < 6000
 }

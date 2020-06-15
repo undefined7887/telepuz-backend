@@ -23,7 +23,7 @@ func (e *AuthLoginReply) String() string {
 }
 
 type MessagesSendEvent struct {
-	models.Message
+	Text string `json:"text"`
 }
 
 func (e *MessagesSendEvent) String() string {
@@ -31,7 +31,8 @@ func (e *MessagesSendEvent) String() string {
 }
 
 type MessagesSendReply struct {
-	Result int `json:"results"`
+	Result    int    `json:"results"`
+	MessageId string `json:"message_id"`
 }
 
 func (e *MessagesSendReply) String() string {
