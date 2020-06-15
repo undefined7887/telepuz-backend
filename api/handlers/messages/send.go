@@ -26,12 +26,12 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 	event := eventInterface.(*events.MessagesSendEvent)
 
 	if !h.checkEvent(event) {
-		h.Client.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
+		h.Client.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
 	if h.Client.UserId == "" {
-		h.Client.Conn.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
+		h.Client.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
 
@@ -41,8 +41,8 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 		Text:   event.Text,
 	}
 
-	h.Client.Conn.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
-	h.Client.BroadcastOthersWithUserId("updates.message.new", &events.MessageNewUpdate{Message: message})
+	h.Client.Send("messages.send", &events.MessagesSendReply{MessageId: message.Id})
+	h.Client.BroadcastSend("updates.message.new", &events.MessageNewUpdate{Message: message})
 }
 
 func (h *SendEventHandler) checkEvent(event *events.MessagesSendEvent) bool {

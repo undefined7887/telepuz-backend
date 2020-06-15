@@ -6,22 +6,25 @@ import (
 )
 
 type Client struct {
+	Id         string
 	ClientPool *repository.Pool
 
-	Id   string
-	Conn network.Conn
-
+	Conn   network.Conn
 	UserId string
 }
 
-func (c *Client) BroadcastOthersWithUserId(path string, event network.Event) {
+func (c *Client) Send(path string, event network.Event) {
+	c.Conn.Send(path, event)
+}
+
+func (c *Client) BroadcastSend(path string, event network.Event) {
 	clients := c.ClientPool.GetAll(c.Id)
 
 	for _, clientInterface := range clients {
 		client := clientInterface.(*Client)
 
 		if client.UserId != "" {
-			client.Conn.Send(path, event)
+			client.Send(path, event)
 		}
 	}
 }

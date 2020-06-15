@@ -22,7 +22,7 @@ func (h *CloseEventHandler) NewEvent() network.Event {
 func (h *CloseEventHandler) ServeEvent(context.Context, network.Event) {
 	if h.Client.UserId != "" {
 		h.UserPool.Remove(h.Client.UserId)
-		h.Client.BroadcastOthersWithUserId("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Client.UserId})
+		h.Client.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Client.UserId})
 	}
 
 	h.ClientPool.Remove(h.Client.Id)

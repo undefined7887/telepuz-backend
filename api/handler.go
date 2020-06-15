@@ -20,7 +20,12 @@ type connHandler struct {
 }
 
 func (h *connHandler) ServeConn(conn network.Conn) {
-	client := &models.Client{ClientPool: h.clientPool, Id: rand.HexString(format.IdLength), Conn: conn}
+	client := &models.Client{
+		Id:         rand.HexString(format.IdLength),
+		ClientPool: h.clientPool,
+		Conn:       conn,
+	}
+
 	h.clientPool.Add(client.Id, client)
 
 	conn.Handle("auth.login", &auth.LoginEventHandler{

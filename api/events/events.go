@@ -6,7 +6,7 @@ import (
 )
 
 type AuthLoginEvent struct {
-	Nickname string `json:"nickname"`
+	UserNickname string `json:"user_nickname"`
 }
 
 func (e *AuthLoginEvent) String() string {
@@ -14,8 +14,8 @@ func (e *AuthLoginEvent) String() string {
 }
 
 type AuthLoginReply struct {
-	Result int    `json:"results"`
-	UserId string `json:"user_id"`
+	Result int    `json:"result"`
+	UserId string `json:"user_id,omitempty"`
 }
 
 func (e *AuthLoginReply) String() string {
@@ -31,8 +31,8 @@ func (e *MessagesSendEvent) String() string {
 }
 
 type MessagesSendReply struct {
-	Result    int    `json:"results"`
-	MessageId string `json:"message_id"`
+	Result    int    `json:"result"`
+	MessageId string `json:"message_id,omitempty"`
 }
 
 func (e *MessagesSendReply) String() string {
@@ -46,8 +46,8 @@ func (e *UsersGetAllEvent) String() string {
 }
 
 type UsersGetAllReply struct {
-	Result int           `json:"results"`
-	Users  []interface{} `json:"users"` // Necessary!
+	Result int           `json:"result"`
+	Users  []interface{} `json:"users,omitempty"` // Necessary!
 }
 
 func (e *UsersGetAllReply) String() string {
