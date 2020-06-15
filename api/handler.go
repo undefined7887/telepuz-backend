@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/undefined7887/telepuz-backend/api/events/handlers"
-	"github.com/undefined7887/telepuz-backend/api/events/handlers/auth"
-	"github.com/undefined7887/telepuz-backend/api/events/handlers/messages"
-	"github.com/undefined7887/telepuz-backend/api/events/handlers/users"
+	"github.com/undefined7887/telepuz-backend/api/handlers"
+	"github.com/undefined7887/telepuz-backend/api/handlers/auth"
+	"github.com/undefined7887/telepuz-backend/api/handlers/messages"
+	"github.com/undefined7887/telepuz-backend/api/handlers/users"
 	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
