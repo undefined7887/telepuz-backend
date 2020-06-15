@@ -25,7 +25,7 @@ func (p *Pool) Get(id string) interface{} {
 	return p.pool[id]
 }
 
-func (p *Pool) GetAll() interface{} {
+func (p *Pool) GetAll() []interface{} {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 

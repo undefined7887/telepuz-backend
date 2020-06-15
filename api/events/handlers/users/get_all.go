@@ -26,5 +26,5 @@ func (h *GetAllEventHandler) ServeEvent(context.Context, network.Event) {
 	}
 
 	users := h.UserPool.GetAll()
-	h.Send("users.getAll", &events.UsersGetAllReply{Users: users.([]*models.User)})
+	h.Send("users.getAll", &events.UsersGetAllReply{Users: users})
 }

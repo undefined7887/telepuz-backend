@@ -45,8 +45,8 @@ func (e *UsersGetAllEvent) String() string {
 }
 
 type UsersGetAllReply struct {
-	Result int            `json:"results"`
-	Users  []*models.User `json:"users"`
+	Result int           `json:"results"`
+	Users  []interface{} `json:"users"` // Necessary!
 }
 
 func (e *UsersGetAllReply) String() string {
