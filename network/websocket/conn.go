@@ -44,7 +44,7 @@ func (c *conn) Send(path string, event network.Event) {
 		return
 	}
 
-	c.logger.Info("Sent events \"%s\": %s", path, event)
+	c.logger.Info("Sent event \"%s\":\n%s", path, event)
 }
 
 func (c *conn) handleEvents() {
@@ -75,7 +75,7 @@ func (c *conn) handleEvents() {
 			continue
 		}
 
-		c.logger.Info("Received events \"%s\": %s", path, event)
+		c.logger.Info("Received event \"%s\":\n%s", path, event)
 
 		ctx, _ := context.WithTimeout(context.TODO(), c.timeout)
 		go handler.ServeEvent(ctx, event)

@@ -10,7 +10,7 @@ type AuthLoginEvent struct {
 }
 
 func (e *AuthLoginEvent) String() string {
-	return utils.PrettyStruct("Event [auth.login] \"", e)
+	return utils.PrettyStruct("Event", e)
 }
 
 type AuthLoginReply struct {
@@ -19,7 +19,7 @@ type AuthLoginReply struct {
 }
 
 func (e *AuthLoginReply) String() string {
-	return utils.PrettyStruct("Reply [auth.login]", e)
+	return utils.PrettyStruct("Reply", e)
 }
 
 type MessagesSendEvent struct {
@@ -27,7 +27,7 @@ type MessagesSendEvent struct {
 }
 
 func (e *MessagesSendEvent) String() string {
-	return utils.PrettyStruct("Event [messages.send]", e)
+	return utils.PrettyStruct("Event", e)
 }
 
 type MessagesSendReply struct {
@@ -35,13 +35,13 @@ type MessagesSendReply struct {
 }
 
 func (e *MessagesSendReply) String() string {
-	return utils.PrettyStruct("Reply [messages.send]", e)
+	return utils.PrettyStruct("Reply", e)
 }
 
 type UsersGetAllEvent struct{}
 
 func (e *UsersGetAllEvent) String() string {
-	return utils.PrettyStruct("Event [users.getAll]", e)
+	return utils.PrettyStruct("Event", e)
 }
 
 type UsersGetAllReply struct {
@@ -50,7 +50,7 @@ type UsersGetAllReply struct {
 }
 
 func (e *UsersGetAllReply) String() string {
-	return utils.PrettyStruct("Reply [users.getAll]", e)
+	return utils.PrettyStruct("Reply", e)
 }
 
 type UserNewUpdate struct {
@@ -58,7 +58,7 @@ type UserNewUpdate struct {
 }
 
 func (e *UserNewUpdate) String() string {
-	return utils.PrettyStruct("Event [updates.user.new]", e)
+	return utils.PrettyStruct("Event", e)
 }
 
 type UserDeletedUpdate struct {
@@ -66,7 +66,7 @@ type UserDeletedUpdate struct {
 }
 
 func (e *UserDeletedUpdate) String() string {
-	return utils.PrettyStruct("Event [updates.user.deleted]", e)
+	return utils.PrettyStruct("Event", e)
 }
 
 type MessageNewUpdate struct {
@@ -74,5 +74,5 @@ type MessageNewUpdate struct {
 }
 
 func (e *MessageNewUpdate) String() string {
-	return utils.PrettyStruct("Event [updates.message.new]", e)
+	return utils.PrettyStruct("Event", e)
 }
