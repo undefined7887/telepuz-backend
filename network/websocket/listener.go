@@ -16,7 +16,7 @@ type listener struct {
 	logger log.Logger
 	inner  http.ServeMux
 
-	conns   map[int]*conn
+	conns   map[string]*conn
 	handler network.ConnHandler
 }
 

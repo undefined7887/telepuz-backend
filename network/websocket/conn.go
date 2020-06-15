@@ -5,14 +5,16 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/undefined7887/telepuz-backend/api/format"
 	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network"
+	"github.com/undefined7887/telepuz-backend/utils/rand"
 	"github.com/vmihailenco/msgpack/v4"
 	"time"
 )
 
 type conn struct {
-	id     int
+	id     string
 	logger log.Logger
 
 	listener *listener
@@ -106,7 +108,7 @@ func newConn(logger log.Logger, listener *listener, inner *websocket.Conn) netwo
 	logger = logger.WithPrefix(fmt.Sprintf("websocket-connection [%s]", inner.RemoteAddr()))
 
 	conn := &conn{
-		id:       len(listener.conns),
+		id:       rand.HexString(format.IdLength),
 		logger:   logger,
 		listener: listener,
 		inner:    inner,
