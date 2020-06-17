@@ -1,7 +1,7 @@
 package events
 
 import (
-	"github.com/undefined7887/telepuz-backend/api/models"
+	"github.com/undefined7887/telepuz-backend/service/models"
 	"github.com/undefined7887/telepuz-backend/utils"
 )
 
@@ -54,6 +54,22 @@ func (e *UsersGetAllReply) String() string {
 	return utils.PrettyStruct("Reply", e)
 }
 
+type UsersSetStatusEvent struct {
+	Status int `json:"status"`
+}
+
+func (e *UsersSetStatusEvent) String() string {
+	return utils.PrettyStruct("Event", e)
+}
+
+type UsersSetStatusReply struct {
+	Result int `json:"result"`
+}
+
+func (e *UsersSetStatusReply) String() string {
+	return utils.PrettyStruct("Reply", e)
+}
+
 type UserNewUpdate struct {
 	User *models.User `json:"user"`
 }
@@ -67,6 +83,15 @@ type UserDeletedUpdate struct {
 }
 
 func (e *UserDeletedUpdate) String() string {
+	return utils.PrettyStruct("Event", e)
+}
+
+type UserNewStatusUpdate struct {
+	UserId     string `json:"user_id"`
+	UserStatus int    `json:"user_status"`
+}
+
+func (e *UserNewStatusUpdate) String() string {
 	return utils.PrettyStruct("Event", e)
 }
 

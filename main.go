@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/undefined7887/telepuz-backend/api"
 	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network/websocket"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/service"
 	"os"
 	"regexp"
 )
@@ -27,7 +27,7 @@ func main() {
 	userPool := repository.NewPool()
 
 	listener := websocket.NewListener(logger, "/", addr)
-	listener.Handle(api.NewConnHandler(listener, clientPool, userPool))
+	listener.Handle(service.NewConnHandler(listener, clientPool, userPool))
 
 	select {}
 }

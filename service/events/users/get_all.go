@@ -2,11 +2,11 @@ package users
 
 import (
 	"context"
-	"github.com/undefined7887/telepuz-backend/api/events"
-	"github.com/undefined7887/telepuz-backend/api/models"
-	"github.com/undefined7887/telepuz-backend/api/results"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/service/events"
+	"github.com/undefined7887/telepuz-backend/service/models"
+	"github.com/undefined7887/telepuz-backend/service/results"
 )
 
 type GetAllEventHandler struct {

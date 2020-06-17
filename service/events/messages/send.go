@@ -2,12 +2,12 @@ package messages
 
 import (
 	"context"
-	"github.com/undefined7887/telepuz-backend/api/events"
-	"github.com/undefined7887/telepuz-backend/api/format"
-	"github.com/undefined7887/telepuz-backend/api/models"
-	"github.com/undefined7887/telepuz-backend/api/results"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/service/events"
+	"github.com/undefined7887/telepuz-backend/service/format"
+	"github.com/undefined7887/telepuz-backend/service/models"
+	"github.com/undefined7887/telepuz-backend/service/results"
 	"github.com/undefined7887/telepuz-backend/utils/rand"
 )
 
@@ -34,6 +34,11 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 		h.Client.Send("messages.send", &events.UsersGetAllReply{Result: results.ErrInvalidSession})
 		return
 	}
+
+	// We need to update status to online after message is sent
+	user := h.UserPool.Get(h.Client.UserId).(*models.User)
+	user.Status = models.UserStatusOnline
+	h.UserPool.Add(user.Id, user)
 
 	message := &models.Message{
 		Id:     rand.HexString(format.IdLength),

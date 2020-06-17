@@ -1,14 +1,14 @@
-package api
+package service
 
 import (
-	"github.com/undefined7887/telepuz-backend/api/format"
-	"github.com/undefined7887/telepuz-backend/api/handlers"
-	"github.com/undefined7887/telepuz-backend/api/handlers/auth"
-	"github.com/undefined7887/telepuz-backend/api/handlers/messages"
-	"github.com/undefined7887/telepuz-backend/api/handlers/users"
-	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/service/events"
+	"github.com/undefined7887/telepuz-backend/service/events/auth"
+	"github.com/undefined7887/telepuz-backend/service/events/messages"
+	"github.com/undefined7887/telepuz-backend/service/events/users"
+	"github.com/undefined7887/telepuz-backend/service/format"
+	"github.com/undefined7887/telepuz-backend/service/models"
 	"github.com/undefined7887/telepuz-backend/utils/rand"
 )
 
@@ -39,13 +39,19 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 		UserPool:   h.userPool,
 	})
 
+	conn.Handle("users.getAll", &users.SetStatusEventHandler{
+		Client:     client,
+		ClientPool: h.clientPool,
+		UserPool:   h.userPool,
+	})
+
 	conn.Handle("messages.send", &messages.SendEventHandler{
 		Client:     client,
 		ClientPool: h.clientPool,
 		UserPool:   h.userPool,
 	})
 
-	conn.Handle("close", &handlers.CloseEventHandler{
+	conn.Handle("close", &events.CloseEventHandler{
 		Client:     client,
 		ClientPool: h.clientPool,
 		UserPool:   h.userPool,

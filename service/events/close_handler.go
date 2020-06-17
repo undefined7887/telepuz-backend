@@ -1,11 +1,10 @@
-package handlers
+package events
 
 import (
 	"context"
-	"github.com/undefined7887/telepuz-backend/api/events"
-	"github.com/undefined7887/telepuz-backend/api/models"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
+	"github.com/undefined7887/telepuz-backend/service/models"
 )
 
 type CloseEventHandler struct {
@@ -22,7 +21,7 @@ func (h *CloseEventHandler) NewEvent() network.Event {
 func (h *CloseEventHandler) ServeEvent(context.Context, network.Event) {
 	if h.Client.UserId != "" {
 		h.UserPool.Remove(h.Client.UserId)
-		h.Client.BroadcastSend("updates.user.deleted", &events.UserDeletedUpdate{UserId: h.Client.UserId})
+		h.Client.BroadcastSend("updates.user.deleted", &UserDeletedUpdate{UserId: h.Client.UserId})
 	}
 
 	h.ClientPool.Remove(h.Client.Id)
