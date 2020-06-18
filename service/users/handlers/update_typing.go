@@ -29,5 +29,5 @@ func (h *UpdateTypingEventHandler) ServeEvent(_ context.Context, eventInterface 
 	}
 
 	h.Client.Send("users.updateTyping", &events.UpdateTypingReply{})
-	h.Client.BroadcastSend("updates.user.newStatus", &events.NewTypingUpdate{UserId: h.Client.UserId, UserTyping: event.UserTyping})
+	h.Client.BroadcastSend("updates.user.newTyping", &events.NewTypingUpdate{UserId: h.Client.UserId, UserTyping: event.UserTyping})
 }
