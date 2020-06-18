@@ -13,27 +13,27 @@ import (
 	usersModels "github.com/undefined7887/telepuz-backend/service/users/models"
 )
 
-type SendEventHandler struct {
+type CreateEventHandler struct {
 	Client *service.Client
 
 	ClientPool *repository.Pool
 	UserPool   *repository.Pool
 }
 
-func (h *SendEventHandler) NewEvent() network.Event {
-	return &events.SendEvent{}
+func (h *CreateEventHandler) NewEvent() network.Event {
+	return &events.Create{}
 }
 
-func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	event := eventInterface.(*events.SendEvent)
+func (h *CreateEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
+	event := eventInterface.(*events.Create)
 
 	if !h.checkEvent(event) {
-		h.Client.Send("messages.send", &events.SendReply{Result: results.ErrInvalidFormat})
+		h.Client.Send("messages.create", &events.CreateReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
 	if h.Client.UserId == "" {
-		h.Client.Send("messages.send", &events.SendReply{Result: results.ErrInvalidSession})
+		h.Client.Send("messages.create", &events.CreateReply{Result: results.ErrInvalidSession})
 		return
 	}
 
@@ -48,10 +48,10 @@ func (h *SendEventHandler) ServeEvent(_ context.Context, eventInterface network.
 		Text:   event.MessageText,
 	}
 
-	h.Client.Send("messages.send", &events.SendReply{MessageId: message.Id})
-	h.Client.BroadcastSend("updates.message.new", &events.NewUpdate{Message: message})
+	h.Client.Send("messages.create", &events.CreateReply{Result: results.Ok, MessageId: message.Id})
+	h.Client.BroadcastSend("messages.created", &events.Created{Message: message})
 }
 
-func (h *SendEventHandler) checkEvent(event *events.SendEvent) bool {
+func (h *CreateEventHandler) checkEvent(event *events.Create) bool {
 	return len(event.MessageText) > 0 && len(event.MessageText) < 6000
 }

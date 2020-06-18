@@ -5,10 +5,27 @@ import (
 	"github.com/undefined7887/telepuz-backend/service/users/models"
 )
 
-type GetEvent struct{}
+type Create struct {
+	UserNickname string `json:"user_nickname"`
+}
 
-func (e *GetEvent) String() string {
+func (e *Create) String() string {
+	return log.PrettyStruct("Event", e)
+}
+
+type CreateReply struct {
+	Result int    `json:"result"`
+	UserId string `json:"user_id,omitempty"` // Necessary!
+}
+
+func (e *CreateReply) String() string {
 	return log.PrettyStruct("Reply", e)
+}
+
+type Get struct{}
+
+func (e *Get) String() string {
+	return log.PrettyStruct("Event", e)
 }
 
 type GetReply struct {
@@ -20,11 +37,11 @@ func (e *GetReply) String() string {
 	return log.PrettyStruct("Reply", e)
 }
 
-type UpdateStatusEvent struct {
+type UpdateStatus struct {
 	UserStatus int `json:"user_status"`
 }
 
-func (e *UpdateStatusEvent) String() string {
+func (e *UpdateStatus) String() string {
 	return log.PrettyStruct("Event", e)
 }
 
@@ -36,27 +53,27 @@ func (e *UpdateStatusReply) String() string {
 	return log.PrettyStruct("Reply", e)
 }
 
-type NewUpdate struct {
+type Created struct {
 	User *models.User `json:"user"`
 }
 
-func (e *NewUpdate) String() string {
+func (e *Created) String() string {
 	return log.PrettyStruct("Event", e)
 }
 
-type DeletedUpdate struct {
+type Removed struct {
 	UserId string `json:"user_id"`
 }
 
-func (e *DeletedUpdate) String() string {
+func (e *Removed) String() string {
 	return log.PrettyStruct("Event", e)
 }
 
-type NewStatusUpdate struct {
+type StatusUpdated struct {
 	UserId     string `json:"user_id"`
 	UserStatus int    `json:"user_status"`
 }
 
-func (e *NewStatusUpdate) String() string {
+func (e *StatusUpdated) String() string {
 	return log.PrettyStruct("Event", e)
 }

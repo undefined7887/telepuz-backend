@@ -7,7 +7,7 @@ import (
 )
 
 func NewService(client *service.Client, clientPool, userPool *repository.Pool) {
-	client.Conn.Handle("messages.send", &handlers.SendEventHandler{
+	client.Conn.Handle("messages.create", &handlers.CreateEventHandler{
 		Client:     client,
 		ClientPool: clientPool,
 		UserPool:   userPool,

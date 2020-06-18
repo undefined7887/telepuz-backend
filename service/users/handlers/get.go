@@ -17,7 +17,7 @@ type GetEventHandler struct {
 }
 
 func (h *GetEventHandler) NewEvent() network.Event {
-	return &events.GetEvent{}
+	return &events.Get{}
 }
 
 func (h *GetEventHandler) ServeEvent(context.Context, network.Event) {
@@ -26,5 +26,5 @@ func (h *GetEventHandler) ServeEvent(context.Context, network.Event) {
 		return
 	}
 
-	h.Client.Send("users.get", &events.GetReply{Users: h.UserPool.GetAll("")})
+	h.Client.Send("users.get", &events.GetReply{Result: results.Ok, Users: h.UserPool.GetAll("")})
 }

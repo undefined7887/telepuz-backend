@@ -6,7 +6,6 @@ import (
 	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/auth"
 	"github.com/undefined7887/telepuz-backend/service/common/format"
 	"github.com/undefined7887/telepuz-backend/service/messages"
 	"github.com/undefined7887/telepuz-backend/service/users"
@@ -56,7 +55,6 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 	}
 	h.clientPool.Add(client.Id, client)
 
-	auth.NewService(client, h.clientPool, h.userPool)
 	users.NewService(client, h.clientPool, h.userPool)
 	messages.NewService(client, h.clientPool, h.userPool)
 }

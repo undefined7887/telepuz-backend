@@ -5,27 +5,27 @@ import (
 	"github.com/undefined7887/telepuz-backend/service/messages/models"
 )
 
-type SendEvent struct {
+type Create struct {
 	MessageText string `json:"message_text"`
 }
 
-func (e *SendEvent) String() string {
+func (e *Create) String() string {
 	return log.PrettyStruct("Event", e)
 }
 
-type SendReply struct {
+type CreateReply struct {
 	Result    int    `json:"result"`
 	MessageId string `json:"message_id,omitempty"`
 }
 
-func (e *SendReply) String() string {
+func (e *CreateReply) String() string {
 	return log.PrettyStruct("Reply", e)
 }
 
-type NewUpdate struct {
+type Created struct {
 	Message *models.Message `json:"message"`
 }
 
-func (e *NewUpdate) String() string {
+func (e *Created) String() string {
 	return log.PrettyStruct("Event", e)
 }

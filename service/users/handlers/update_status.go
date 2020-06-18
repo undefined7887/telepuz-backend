@@ -18,11 +18,11 @@ type UpdateStatusEventHandler struct {
 }
 
 func (h *UpdateStatusEventHandler) NewEvent() network.Event {
-	return &events.UpdateStatusEvent{}
+	return &events.UpdateStatus{}
 }
 
 func (h *UpdateStatusEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	event := eventInterface.(*events.UpdateStatusEvent)
+	event := eventInterface.(*events.UpdateStatus)
 
 	if !h.checkEvent(event) {
 		h.Client.Send("users.updateStatus", &events.UpdateStatusReply{Result: results.ErrInvalidFormat})
@@ -38,10 +38,10 @@ func (h *UpdateStatusEventHandler) ServeEvent(_ context.Context, eventInterface 
 	user.Status = event.UserStatus
 	h.UserPool.Add(user.Id, user)
 
-	h.Client.Send("users.updateStatus", &events.UpdateStatusReply{})
-	h.Client.BroadcastSend("updates.user.newStatus", &events.NewStatusUpdate{UserId: user.Id, UserStatus: user.Status})
+	h.Client.Send("users.updateStatus", &events.UpdateStatusReply{Result: results.Ok})
+	h.Client.BroadcastSend("user.statusUpdated", &events.StatusUpdated{UserId: user.Id, UserStatus: user.Status})
 }
 
-func (h *UpdateStatusEventHandler) checkEvent(event *events.UpdateStatusEvent) bool {
+func (h *UpdateStatusEventHandler) checkEvent(event *events.UpdateStatus) bool {
 	return event.UserStatus > -1 && event.UserStatus < 3
 }

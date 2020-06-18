@@ -8,21 +8,21 @@ import (
 	"github.com/undefined7887/telepuz-backend/service/users/events"
 )
 
-type CloseEventHandler struct {
+type RemoveEventHandler struct {
 	Client *service.Client
 
 	ClientPool *repository.Pool
 	UserPool   *repository.Pool
 }
 
-func (h *CloseEventHandler) NewEvent() network.Event {
+func (h *RemoveEventHandler) NewEvent() network.Event {
 	return nil
 }
 
-func (h *CloseEventHandler) ServeEvent(context.Context, network.Event) {
+func (h *RemoveEventHandler) ServeEvent(context.Context, network.Event) {
 	if h.Client.UserId != "" {
 		h.UserPool.Remove(h.Client.UserId)
-		h.Client.BroadcastSend("updates.user.deleted", &events.DeletedUpdate{UserId: h.Client.UserId})
+		h.Client.BroadcastSend("users.removed", &events.Removed{UserId: h.Client.UserId})
 	}
 
 	h.ClientPool.Remove(h.Client.Id)
