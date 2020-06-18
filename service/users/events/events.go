@@ -36,6 +36,22 @@ func (e *UpdateStatusReply) String() string {
 	return log.PrettyStruct("Reply", e)
 }
 
+type UpdateTypingEvent struct {
+	UserTyping bool `json:"user_typing"`
+}
+
+func (e *UpdateTypingEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
+
+type UpdateTypingReply struct {
+	Result int `json:"result"`
+}
+
+func (e *UpdateTypingReply) String() string {
+	return log.PrettyStruct("Reply", e)
+}
+
 type NewUpdate struct {
 	User *models.User `json:"user"`
 }
@@ -58,5 +74,14 @@ type NewStatusUpdate struct {
 }
 
 func (e *NewStatusUpdate) String() string {
+	return log.PrettyStruct("Event", e)
+}
+
+type NewTypingUpdate struct {
+	UserId     string `json:"user_id"`
+	UserTyping bool   `json:"user_typing"`
+}
+
+func (e *NewTypingUpdate) String() string {
 	return log.PrettyStruct("Event", e)
 }

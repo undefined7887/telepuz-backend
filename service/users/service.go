@@ -19,6 +19,12 @@ func NewService(client *service.Client, clientPool, userPool *repository.Pool) {
 		UserPool:   userPool,
 	})
 
+	client.Conn.Handle("users.updateTyping", &handlers.UpdateTypingEventHandler{
+		Client:     client,
+		ClientPool: clientPool,
+		UserPool:   userPool,
+	})
+
 	client.Conn.Handle("close", &handlers.CloseEventHandler{
 		Client:     client,
 		ClientPool: clientPool,
