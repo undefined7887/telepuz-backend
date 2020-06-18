@@ -2,16 +2,40 @@ package handlers
 
 import (
 	"context"
+	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/common/format"
-	"github.com/undefined7887/telepuz-backend/service/common/results"
-	"github.com/undefined7887/telepuz-backend/service/messages/events"
-	"github.com/undefined7887/telepuz-backend/service/messages/models"
-	usersModels "github.com/undefined7887/telepuz-backend/service/users/models"
+	"github.com/undefined7887/telepuz-backend/service/format"
+	"github.com/undefined7887/telepuz-backend/service/models"
+	"github.com/undefined7887/telepuz-backend/service/results"
 )
+
+type CreateEvent struct {
+	MessageText string `json:"message_text"`
+}
+
+func (e *CreateEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
+
+type CreateReply struct {
+	Result    int    `json:"result"`
+	MessageId string `json:"message_id,omitempty"`
+}
+
+func (e *CreateReply) String() string {
+	return log.PrettyStruct("Reply", e)
+}
+
+type CreatedEvent struct {
+	Message *models.Message `json:"message"`
+}
+
+func (e *CreatedEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
 
 type CreateEventHandler struct {
 	Client *service.Client
@@ -21,25 +45,25 @@ type CreateEventHandler struct {
 }
 
 func (h *CreateEventHandler) NewEvent() network.Event {
-	return &events.Create{}
+	return &CreateEvent{}
 }
 
 func (h *CreateEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	event := eventInterface.(*events.Create)
+	event := eventInterface.(*CreateEvent)
 
 	if !h.checkEvent(event) {
-		h.Client.Send("messages.create", &events.CreateReply{Result: results.ErrInvalidFormat})
+		h.Client.Send("messages.create", &CreateReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
 	if h.Client.UserId == "" {
-		h.Client.Send("messages.create", &events.CreateReply{Result: results.ErrInvalidSession})
+		h.Client.Send("messages.create", &CreateReply{Result: results.ErrInvalidSession})
 		return
 	}
 
 	// We need to update status to online after message is sent
-	user := h.UserPool.Get(h.Client.UserId).(*usersModels.User)
-	user.Status = usersModels.UserStatusOnline
+	user := h.UserPool.Get(h.Client.UserId).(*models.User)
+	user.Status = models.UserStatusOnline
 	h.UserPool.Add(user.Id, user)
 
 	message := &models.Message{
@@ -48,10 +72,10 @@ func (h *CreateEventHandler) ServeEvent(_ context.Context, eventInterface networ
 		Text:   event.MessageText,
 	}
 
-	h.Client.Send("messages.create", &events.CreateReply{Result: results.Ok, MessageId: message.Id})
-	h.Client.BroadcastSend("messages.created", &events.Created{Message: message})
+	h.Client.Send("messages.create", &CreateReply{Result: results.Ok, MessageId: message.Id})
+	h.Client.BroadcastSend("messages.created", &CreatedEvent{Message: message})
 }
 
-func (h *CreateEventHandler) checkEvent(event *events.Create) bool {
+func (h *CreateEventHandler) checkEvent(event *CreateEvent) bool {
 	return len(event.MessageText) > 0 && len(event.MessageText) < 6000
 }

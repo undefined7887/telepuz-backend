@@ -6,7 +6,7 @@ import (
 	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/common/format"
+	"github.com/undefined7887/telepuz-backend/service/format"
 	"github.com/undefined7887/telepuz-backend/service/messages"
 	"github.com/undefined7887/telepuz-backend/service/users"
 	"os"

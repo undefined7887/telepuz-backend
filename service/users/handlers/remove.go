@@ -2,11 +2,19 @@ package handlers
 
 import (
 	"context"
+	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/users/events"
 )
+
+type RemovedEvent struct {
+	UserId string `json:"user_id"`
+}
+
+func (e *RemovedEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
 
 type RemoveEventHandler struct {
 	Client *service.Client
@@ -22,7 +30,7 @@ func (h *RemoveEventHandler) NewEvent() network.Event {
 func (h *RemoveEventHandler) ServeEvent(context.Context, network.Event) {
 	if h.Client.UserId != "" {
 		h.UserPool.Remove(h.Client.UserId)
-		h.Client.BroadcastSend("users.removed", &events.Removed{UserId: h.Client.UserId})
+		h.Client.BroadcastSend("users.removed", &RemovedEvent{UserId: h.Client.UserId})
 	}
 
 	h.ClientPool.Remove(h.Client.Id)

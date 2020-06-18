@@ -2,15 +2,40 @@ package handlers
 
 import (
 	"context"
+	"github.com/undefined7887/telepuz-backend/log"
 	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/common/format"
-	"github.com/undefined7887/telepuz-backend/service/common/results"
-	"github.com/undefined7887/telepuz-backend/service/users/events"
-	"github.com/undefined7887/telepuz-backend/service/users/models"
+	"github.com/undefined7887/telepuz-backend/service/format"
+	models2 "github.com/undefined7887/telepuz-backend/service/models"
+	"github.com/undefined7887/telepuz-backend/service/results"
 )
+
+type CreateEvent struct {
+	UserNickname string `json:"user_nickname"`
+}
+
+func (e *CreateEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
+
+type CreateReply struct {
+	Result int    `json:"result"`
+	UserId string `json:"user_id,omitempty"` // Necessary!
+}
+
+func (e *CreateReply) String() string {
+	return log.PrettyStruct("Reply", e)
+}
+
+type CreatedEvent struct {
+	User *models2.User `json:"user"`
+}
+
+func (e *CreatedEvent) String() string {
+	return log.PrettyStruct("Event", e)
+}
 
 type CreateEventHandler struct {
 	Client *service.Client
@@ -20,35 +45,35 @@ type CreateEventHandler struct {
 }
 
 func (h *CreateEventHandler) NewEvent() network.Event {
-	return &events.Create{}
+	return &CreateEvent{}
 }
 
 func (h *CreateEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	event := eventInterface.(*events.Create)
+	event := eventInterface.(*CreateEvent)
 
 	if !h.checkEvent(event) {
-		h.Client.Send("users.create", &events.CreateReply{Result: results.ErrInvalidFormat})
+		h.Client.Send("users.create", &CreateReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
-	user := &models.User{
+	user := &models2.User{
 		Id:       rand.HexString(format.IdLength),
 		Nickname: event.UserNickname,
-		Status:   models.UserStatusOnline,
+		Status:   models2.UserStatusOnline,
 	}
 	h.UserPool.Add(user.Id, user)
 
 	if h.Client.UserId != "" {
 		h.UserPool.Remove(h.Client.UserId)
-		h.Client.BroadcastSend("users.removed", &events.Removed{UserId: h.Client.UserId})
+		h.Client.BroadcastSend("users.removed", &RemovedEvent{UserId: h.Client.UserId})
 	}
 
 	h.Client.UserId = user.Id
 
-	h.Client.Send("users.create", &events.CreateReply{Result: results.Ok, UserId: user.Id})
-	h.Client.BroadcastSend("users.created", &events.Created{User: user})
+	h.Client.Send("users.create", &CreateReply{Result: results.Ok, UserId: user.Id})
+	h.Client.BroadcastSend("users.created", &CreatedEvent{User: user})
 }
 
-func (h *CreateEventHandler) checkEvent(event *events.Create) bool {
+func (h *CreateEventHandler) checkEvent(event *CreateEvent) bool {
 	return format.UserNicknameRegexp.MatchString(event.UserNickname)
 }
