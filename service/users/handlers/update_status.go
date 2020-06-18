@@ -64,7 +64,7 @@ func (h *UpdateStatusEventHandler) ServeEvent(_ context.Context, eventInterface 
 	h.UserPool.Add(user.Id, user)
 
 	h.Client.Send("users.updateStatus", &UpdateStatusReply{Result: results.Ok})
-	h.Client.BroadcastSend("user.statusUpdated", &StatusUpdatedEvent{UserId: user.Id, UserStatus: user.Status})
+	h.Client.BroadcastSend("users.statusUpdated", &StatusUpdatedEvent{UserId: user.Id, UserStatus: user.Status})
 }
 
 func (h *UpdateStatusEventHandler) checkEvent(event *UpdateStatusEvent) bool {
