@@ -7,7 +7,7 @@ import (
 	"github.com/undefined7887/telepuz-backend/service"
 	"github.com/undefined7887/telepuz-backend/service/common/results"
 	"github.com/undefined7887/telepuz-backend/service/users/events"
-	models "github.com/undefined7887/telepuz-backend/service/users/models"
+	"github.com/undefined7887/telepuz-backend/service/users/models"
 )
 
 type UpdateStatusEventHandler struct {

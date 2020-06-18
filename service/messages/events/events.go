@@ -2,7 +2,7 @@ package events
 
 import (
 	"github.com/undefined7887/telepuz-backend/log"
-	models2 "github.com/undefined7887/telepuz-backend/service/messages/models"
+	"github.com/undefined7887/telepuz-backend/service/messages/models"
 )
 
 type SendEvent struct {
@@ -23,7 +23,7 @@ func (e *SendReply) String() string {
 }
 
 type NewUpdate struct {
-	Message *models2.Message `json:"message"`
+	Message *models.Message `json:"message"`
 }
 
 func (e *NewUpdate) String() string {

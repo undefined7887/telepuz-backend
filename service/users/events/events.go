@@ -2,7 +2,7 @@ package events
 
 import (
 	"github.com/undefined7887/telepuz-backend/log"
-	models "github.com/undefined7887/telepuz-backend/service/users/models"
+	"github.com/undefined7887/telepuz-backend/service/users/models"
 )
 
 type GetEvent struct{}
