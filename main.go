@@ -2,9 +2,14 @@ package main
 
 import (
 	"github.com/undefined7887/telepuz-backend/log"
-	"github.com/undefined7887/telepuz-backend/network/websocket"
+	"github.com/undefined7887/telepuz-backend/network"
+	"github.com/undefined7887/telepuz-backend/rand"
 	"github.com/undefined7887/telepuz-backend/repository"
 	"github.com/undefined7887/telepuz-backend/service"
+	"github.com/undefined7887/telepuz-backend/service/auth"
+	"github.com/undefined7887/telepuz-backend/service/common/format"
+	"github.com/undefined7887/telepuz-backend/service/messages"
+	"github.com/undefined7887/telepuz-backend/service/users"
 	"os"
 	"regexp"
 )
@@ -26,8 +31,32 @@ func main() {
 	clientPool := repository.NewPool()
 	userPool := repository.NewPool()
 
-	listener := websocket.NewListener(logger, "/", addr)
-	listener.Handle(service.NewConnHandler(listener, clientPool, userPool))
+	listener := network.NewWebsocketListener(logger, "/", addr)
+	listener.Handle(&connHandler{
+		listener:   listener,
+		clientPool: clientPool,
+		userPool:   userPool,
+	})
 
 	select {}
+}
+
+type connHandler struct {
+	listener network.Listener
+
+	clientPool *repository.Pool
+	userPool   *repository.Pool
+}
+
+func (h *connHandler) ServeConn(conn network.Conn) {
+	client := &service.Client{
+		Id:         rand.HexString(format.IdLength),
+		ClientPool: h.clientPool,
+		Conn:       conn,
+	}
+	h.clientPool.Add(client.Id, client)
+
+	auth.NewService(client, h.clientPool, h.userPool)
+	users.NewService(client, h.clientPool, h.userPool)
+	messages.NewService(client, h.clientPool, h.userPool)
 }

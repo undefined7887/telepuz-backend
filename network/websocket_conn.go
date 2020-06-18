@@ -1,4 +1,4 @@
-package websocket
+package network
 
 import (
 	"bytes"
@@ -6,28 +6,27 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/undefined7887/telepuz-backend/log"
-	"github.com/undefined7887/telepuz-backend/network"
 	"github.com/vmihailenco/msgpack/v4"
 	"time"
 )
 
-type conn struct {
+type websocketConn struct {
 	logger log.Logger
 	inner  *websocket.Conn
 
 	timeout  time.Duration
-	handlers map[string]network.EventHandler
+	handlers map[string]EventHandler
 }
 
-func (c *conn) SetTimeout(timeout time.Duration) {
+func (c *websocketConn) SetTimeout(timeout time.Duration) {
 	c.timeout = timeout
 }
 
-func (c *conn) Handle(path string, handler network.EventHandler) {
+func (c *websocketConn) Handle(path string, handler EventHandler) {
 	c.handlers[path] = handler
 }
 
-func (c *conn) Send(path string, event network.Event) {
+func (c *websocketConn) Send(path string, event Event) {
 	buffer := bytes.NewBuffer(nil)
 	encoder := msgpack.NewEncoder(buffer).UseJSONTag(true)
 
@@ -47,7 +46,7 @@ func (c *conn) Send(path string, event network.Event) {
 	c.logger.Info("Sent event \"%s\":\n%s", path, event)
 }
 
-func (c *conn) handleEvents() {
+func (c *websocketConn) handleEvents() {
 	for {
 		_, msg, err := c.inner.ReadMessage()
 		if err != nil {
@@ -55,7 +54,7 @@ func (c *conn) handleEvents() {
 
 			handler := c.handlers["close"]
 			if handler == nil {
-				c.logger.Warn("Failed to find handler for close")
+				c.logger.Warn("Failed to find handlers for close")
 				continue
 			}
 
@@ -73,7 +72,7 @@ func (c *conn) handleEvents() {
 
 		handler := c.handlers[path]
 		if handler == nil {
-			c.logger.Warn("Failed to find handler for path: %s", path)
+			c.logger.Warn("Failed to find handlers for path: %s", path)
 			continue
 		}
 
@@ -90,13 +89,13 @@ func (c *conn) handleEvents() {
 	}
 }
 
-func newConn(logger log.Logger, inner *websocket.Conn) network.Conn {
+func newWebsocketConn(logger log.Logger, inner *websocket.Conn) Conn {
 	logger = logger.WithPrefix(fmt.Sprintf("websocket-connection [%s]", inner.RemoteAddr()))
 
-	conn := &conn{
+	conn := &websocketConn{
 		logger:   logger,
 		inner:    inner,
-		handlers: make(map[string]network.EventHandler),
+		handlers: make(map[string]EventHandler),
 	}
 
 	go conn.handleEvents()

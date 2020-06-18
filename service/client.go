@@ -1,4 +1,4 @@
-package models
+package service
 
 import (
 	"github.com/undefined7887/telepuz-backend/network"
@@ -6,11 +6,11 @@ import (
 )
 
 type Client struct {
-	Id         string
-	ClientPool *repository.Pool
-
-	Conn   network.Conn
+	Id     string
 	UserId string
+
+	Conn       network.Conn
+	ClientPool *repository.Pool
 }
 
 func (c *Client) Send(path string, event network.Event) {

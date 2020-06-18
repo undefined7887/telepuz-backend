@@ -1,6 +1,7 @@
 package log
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
 )
@@ -22,4 +23,13 @@ type Logger interface {
 	Info(format string, values ...interface{})
 	Warn(format string, values ...interface{})
 	Fatal(format string, values ...interface{})
+}
+
+func PrettyStruct(prefix string, value interface{}) string {
+	bytes, err := json.MarshalIndent(value, "", "\t")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return prefix + " " + string(bytes)
 }
