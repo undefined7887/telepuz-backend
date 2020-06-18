@@ -54,19 +54,19 @@ func (e *UsersGetAllReply) String() string {
 	return utils.PrettyStruct("Reply", e)
 }
 
-type UsersSetStatusEvent struct {
+type UsersUpdateStatusEvent struct {
 	Status int `json:"status"`
 }
 
-func (e *UsersSetStatusEvent) String() string {
+func (e *UsersUpdateStatusEvent) String() string {
 	return utils.PrettyStruct("Event", e)
 }
 
-type UsersSetStatusReply struct {
+type UsersUpdateStatusReply struct {
 	Result int `json:"result"`
 }
 
-func (e *UsersSetStatusReply) String() string {
+func (e *UsersUpdateStatusReply) String() string {
 	return utils.PrettyStruct("Reply", e)
 }
 

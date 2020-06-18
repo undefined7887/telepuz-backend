@@ -33,6 +33,7 @@ func (h *LoginEventHandler) ServeEvent(_ context.Context, eventInterface network
 	user := &models.User{
 		Id:       rand.HexString(format.IdLength),
 		Nickname: event.UserNickname,
+		Status:   models.UserStatusOnline,
 	}
 	h.UserPool.Add(user.Id, user)
 

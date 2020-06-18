@@ -9,27 +9,27 @@ import (
 	"github.com/undefined7887/telepuz-backend/service/results"
 )
 
-type SetStatusEventHandler struct {
+type UpdateStatusEventHandler struct {
 	Client *models.Client
 
 	ClientPool *repository.Pool
 	UserPool   *repository.Pool
 }
 
-func (h *SetStatusEventHandler) NewEvent() network.Event {
-	return &events.UsersGetAllEvent{}
+func (h *UpdateStatusEventHandler) NewEvent() network.Event {
+	return &events.UsersUpdateStatusEvent{}
 }
 
-func (h *SetStatusEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
-	event := eventInterface.(*events.UsersSetStatusEvent)
+func (h *UpdateStatusEventHandler) ServeEvent(_ context.Context, eventInterface network.Event) {
+	event := eventInterface.(*events.UsersUpdateStatusEvent)
 
 	if !h.checkEvent(event) {
-		h.Client.Send("users.setStatus", &events.UsersSetStatusReply{Result: results.ErrInvalidFormat})
+		h.Client.Send("users.updateStatus", &events.UsersUpdateStatusReply{Result: results.ErrInvalidFormat})
 		return
 	}
 
 	if h.Client.UserId == "" {
-		h.Client.Send("users.setStatus", &events.UsersSetStatusReply{Result: results.ErrInvalidSession})
+		h.Client.Send("users.updateStatus", &events.UsersUpdateStatusReply{Result: results.ErrInvalidSession})
 		return
 	}
 
@@ -37,10 +37,10 @@ func (h *SetStatusEventHandler) ServeEvent(_ context.Context, eventInterface net
 	user.Status = event.Status
 	h.UserPool.Add(user.Id, user)
 
-	h.Client.Send("users.setStatus", &events.UsersSetStatusReply{})
+	h.Client.Send("users.updateStatus", &events.UsersUpdateStatusReply{})
 	h.Client.BroadcastSend("updates.user.newStatus", &events.UserNewStatusUpdate{UserId: user.Id, UserStatus: user.Status})
 }
 
-func (h *SetStatusEventHandler) checkEvent(event *events.UsersSetStatusEvent) bool {
+func (h *UpdateStatusEventHandler) checkEvent(event *events.UsersUpdateStatusEvent) bool {
 	return event.Status > -1 && event.Status < 3
 }

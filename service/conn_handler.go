@@ -39,7 +39,7 @@ func (h *connHandler) ServeConn(conn network.Conn) {
 		UserPool:   h.userPool,
 	})
 
-	conn.Handle("users.getAll", &users.SetStatusEventHandler{
+	conn.Handle("users.updateStatus", &users.UpdateStatusEventHandler{
 		Client:     client,
 		ClientPool: h.clientPool,
 		UserPool:   h.userPool,
