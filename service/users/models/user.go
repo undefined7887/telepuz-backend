@@ -9,4 +9,5 @@ type User struct {
 const (
 	UserStatusOffline = iota
 	UserStatusOnline
+	UserStatusTyping
 )
