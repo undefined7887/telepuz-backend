@@ -43,7 +43,7 @@ func (l *websocketListener) handleConns(writer http.ResponseWriter, req *http.Re
 }
 
 func NewWebsocketListener(logger log.Logger, path, addr string) Listener {
-	logger = logger.WithPrefix("websocket-websocketListener")
+	logger = logger.WithPrefix("websocket-listener")
 
 	listener := &websocketListener{logger: logger}
 
