@@ -20,6 +20,9 @@ func (l *websocketListener) Listen() {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
 	}
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
