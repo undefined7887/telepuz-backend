@@ -2,13 +2,11 @@ package main
 
 import (
 	"github.com/undefined7887/telepuz-backend/log"
-	"github.com/undefined7887/telepuz-backend/network"
-	"github.com/undefined7887/telepuz-backend/rand"
-	"github.com/undefined7887/telepuz-backend/repository"
-	"github.com/undefined7887/telepuz-backend/service"
-	"github.com/undefined7887/telepuz-backend/service/format"
-	"github.com/undefined7887/telepuz-backend/service/messages"
-	"github.com/undefined7887/telepuz-backend/service/users"
+	"github.com/undefined7887/telepuz-backend/services/common"
+	"github.com/undefined7887/telepuz-backend/services/messages"
+	"github.com/undefined7887/telepuz-backend/services/users"
+	"github.com/undefined7887/telepuz-backend/transport"
+	"github.com/undefined7887/telepuz-backend/utils"
 	"os"
 	"regexp"
 )
@@ -27,34 +25,30 @@ func main() {
 		logger.Fatal("Wrong address format: address should be like ip:port")
 	}
 
-	clientPool := repository.NewPool()
-	userPool := repository.NewPool()
+	clientPool := utils.NewPool()
+	userPool := utils.NewPool()
 
-	listener := network.NewWebsocketListener(logger, "/", addr)
-	listener.Handle(&connHandler{
+	listener := transport.NewWebsocketListener(logger, addr)
+	listener.OnConn(&connHandler{
 		listener:   listener,
 		clientPool: clientPool,
 		userPool:   userPool,
 	})
 
+	listener.Listen()
 	select {}
 }
 
 type connHandler struct {
-	listener network.Listener
+	listener transport.Listener
 
-	clientPool *repository.Pool
-	userPool   *repository.Pool
+	clientPool *utils.Pool
+	userPool   *utils.Pool
 }
 
-func (h *connHandler) ServeConn(conn network.Conn) {
-	client := &service.Client{
-		Id:         rand.HexString(format.IdLength),
-		ClientPool: h.clientPool,
-		Conn:       conn,
-	}
-	h.clientPool.Add(client.Id, client)
+func (h *connHandler) ServeConn(conn transport.Conn) {
+	client := common.NewClient(conn, h.clientPool)
 
 	users.NewService(client, h.clientPool, h.userPool)
-	messages.NewService(client, h.clientPool, h.userPool)
+	messages.NewService(client, h.clientPool)
 }

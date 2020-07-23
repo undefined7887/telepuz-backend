@@ -1,4 +1,4 @@
-package rand
+package utils
 
 import (
 	"crypto/rand"
@@ -6,7 +6,7 @@ import (
 	"math/big"
 )
 
-func Int(min, max int) int {
+func RandInt(min, max int) int {
 	diff := big.NewInt(int64(max - min))
 
 	number, err := rand.Int(rand.Reader, diff)
@@ -17,7 +17,7 @@ func Int(min, max int) int {
 	return int(number.Int64()) + min
 }
 
-func Bytes(length int) []byte {
+func RandBytes(length int) []byte {
 	bytes := make([]byte, length)
 	if _, err := rand.Read(bytes); err != nil {
 		panic(err.Error())
@@ -26,6 +26,6 @@ func Bytes(length int) []byte {
 	return bytes
 }
 
-func HexString(length int) string {
-	return hex.EncodeToString(Bytes(length))
+func RandHexString(length int) string {
+	return hex.EncodeToString(RandBytes(length))
 }
